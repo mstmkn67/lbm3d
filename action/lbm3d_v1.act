@@ -1,0 +1,48 @@
+action :result() : \begin
+c=1.0
+nx,ny,nz,dx=$system_size
+for k in range(nz+1):
+	for j in range(ny+1):
+		for i in range(nx+1):
+			u=$simulation_result.lattice.u[i][j][k].u
+			v=$simulation_result.lattice.u[i][j][k].v
+			w=$simulation_result.lattice.u[i][j][k].w
+			line([i*dx,j*dx,k*dx],[i*dx+c*u,j*dx+c*v,k*dx+c*w],1)
+			point([i*dx,j*dx,k*dx],1)
+\end
+action :out_vtk(flowfile="flow",Velocity="True|False",Pressure="True|False"): \begin
+vflag,pflag=Velocity,Pressure
+def output_flow(name,no):
+	file=open(udfDirectory()+"/"+name+"%d.vtk"%(no),"w")
+	[nx,ny,nz,dx]=$system_size
+	file.write("# vtk DataFile Version 2.0\n")
+	file.write("lbm_3d\n")
+	file.write("ASCII\n")
+	file.write("DATASET STRUCTURED_POINTS\n")
+	file.write("DIMENSIONS %d %d %d\n"%(nx+1,ny+1,nz+1))
+	file.write("ORIGIN %f %f %f\n"%(0.0,0.0,0.0))
+	file.write("SPACING %f %f %f\n\n"%(dx,dx,dx))
+	file.write("POINT_DATA %d\n"%((nx+1)*(ny+1)*(nz+1)))
+	if pflag=="True":
+		file.write("SCALARS p float\n")
+		file.write("LOOKUP_TABLE default\n")
+		for k in range(0,nz+1):
+			for j in range(0,ny+1):
+				for i in range(0,nx+1):
+					s=$simulation_result.lattice.p[i][j][k]
+					file.write("%f\n"%(s))
+		file.write("\n")
+	if vflag=="True":
+		file.write("VECTORS velocity float\n")
+		for k in range(0,nz+1):
+			for j in range(0,ny+1):
+				for i in range(0,nx+1):
+					u=$simulation_result.lattice.u[i][j][k].u
+					v=$simulation_result.lattice.u[i][j][k].v
+					w=$simulation_result.lattice.u[i][j][k].w
+					file.write("%f %f %f\n"%(u,v,w))
+	file.close()
+for n in range(0,totalRecord()):
+	jump(n)
+	output_flow(flowfile,n)
+\end
