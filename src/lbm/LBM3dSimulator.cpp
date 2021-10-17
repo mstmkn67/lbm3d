@@ -27,6 +27,7 @@ LBM3dSimulator::~LBM3dSimulator(){
 }
 
 void LBM3dSimulator::initial(){
+#pragma omp parallel for
 	for(int k=0;k<=lattice->nz;k++){
 		for(int j=0;j<=lattice->ny;j++){
 			for(int i=0;i<=lattice->nx;i++){
@@ -50,6 +51,7 @@ void LBM3dSimulator::update(){
 }
 
 void LBM3dSimulator::reset_bforce(){
+#pragma omp parallel for
 	for(int k=0;k<=lattice->nz;k++){
 		for(int j=0;j<=lattice->ny;j++){
 			for(int i=0;i<=lattice->nx;i++){
@@ -65,6 +67,7 @@ void LBM3dSimulator::reset_bforce(){
 //}
 
 void LBM3dSimulator::calc_density_velocity(){
+#pragma omp parallel for
 	for(int k=0;k<=lattice->nz;k++){
 		for(int j=0;j<=lattice->ny;j++){
 			for(int i=0;i<=lattice->nx;i++){
@@ -75,6 +78,7 @@ void LBM3dSimulator::calc_density_velocity(){
 			}
 		}
 	}
+#pragma omp parallel for
 	for(int k=0;k<=lattice->nz;k++){
 		for(int j=0;j<=lattice->ny;j++){
 			for(int i=0;i<=lattice->nx;i++){
@@ -112,6 +116,7 @@ void LBM3dSimulator::calc_collide(int n,int i,int j,int k){
 }
 
 void LBM3dSimulator::time_update(){
+#pragma omp parallel for
 	for(int k=0;k<=lattice->nz;k++){
 		for(int j=0;j<=lattice->ny;j++){
 			for(int i=0;i<=lattice->nx;i++){

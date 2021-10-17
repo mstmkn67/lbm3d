@@ -1,5 +1,8 @@
 #include "udf/gourmain.h"
 #include "LBM3d.h"
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 void udfHeaderCheck()
 {
@@ -12,12 +15,15 @@ void udfHeaderCheck()
 }
 
 void error_massage(){
-	cout << "usage: lbm3d -I input_udf [-O output_udf] " << endl;
+	cout << "usage: lbm3d -I input_udf [-O output_udf] [-n number of thread]" << endl;
 }
 
 
-int gourmain(UDFManager* in,UDFManager* out){
+int gourmain(UDFManager* in,UDFManager* out,int n){
 	udfHeaderCheck();
+#ifdef _OPENMP
+	omp_set_num_threads(n);
+#endif
 	LBM3d* sim=new LBM3d(in,out);
 	sim->update();
 	delete sim;

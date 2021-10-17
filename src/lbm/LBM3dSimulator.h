@@ -5,6 +5,10 @@
 #include <cmath>
 #include <stdlib.h>
 using namespace std;
+#ifdef _OPENMP
+#include <omp.h>
+#endif
+
 
 class LBM3dSimulator{
 public:

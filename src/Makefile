@@ -1,6 +1,11 @@
 CC = g++
-CFLAG = -c -O3 -I $(PF_FILES)/include
-CCFLAG = -o lbm3d  -L $(PF_FILES)/lib/linux_64 -lplatform
+CFLAG = -c -O3 -I $(PF_FILES)/include -fopenmp
+ifeq ($(ARCH),linux_64)
+	CCFLAG = -o lbm3d  -L $(PF_FILES)/lib/linux_64 -lplatform -fopenmp
+endif
+ifeq ($(ARCH),win64)
+	CCFLAG= -o lbm3d.exe  -L $(PF_FILES)/lib/mingw -lplatform -fopenmp
+endif
 
 OBJECT= Timer.o gourmain.o cmdlineopts.o \
 	LBM3dSimulator.o LBM3dPlates.o LBM3dRect.o LBM3dLeesEdwards.o \
@@ -41,8 +46,19 @@ lbm3d_driver.o : lbm3d_driver.cpp
 	$(CC) lbm3d_driver.cpp $(CFLAG)
 
 clean : 
+ifeq ($(ARCH),linux_64)
 	rm -f *.o lbm3d
+endif
+ifeq ($(ARCH),win64)
+	rm -f *.o lbm3d.exe
+endif
 
 install :
+ifeq ($(ARCH),linux_64)
 	strip lbm3d
 	cp lbm3d ../bin
+endif
+ifeq ($(ARCH),win64)
+	strip lbm3d.exe
+	cp lbm3d.exe ../bin
+endif
